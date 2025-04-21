@@ -76,71 +76,6 @@ public:
 };
 
 
-void merge(unsigned long long arr[], int resultArray[], int left, int mid, int right) {
-    int i, j, k;
-    int n1 = mid - left + 1;
-    int n2 = right - mid;
-
-    unsigned long long leftArr[n1];
-    unsigned long long rightArr[n2];
-    unsigned int resLeft[n1];
-    unsigned int resRight[n2];
-
-    for (i = 0; i < n1; i++){
-        leftArr[i] = arr[left + i];
-        resLeft[i] = resultArray[left + i];
-    }
-    for (j = 0; j < n2; j++){
-        rightArr[j] = arr[mid + 1 + j];
-        resRight[j] = resultArray[mid + 1 + j];
-    }
-
-    i = 0;
-    j = 0;
-    k = left;
-    while (i < n1 && j < n2) {
-        if (leftArr[i] <= rightArr[j]) {
-            arr[k] = leftArr[i];
-            resultArray[k] = resLeft[i];
-            i++;
-        }
-        else {
-            arr[k] = rightArr[j];
-            resultArray[k] = resRight[j];
-            j++;
-        }
-        k++;
-    }
-
-    while (i < n1) {
-        arr[k] = leftArr[i];
-        resultArray[k] = resLeft[i];
-        i++;
-        k++;
-    }
-
-    while (j < n2) {
-        arr[k] = rightArr[j];
-        resultArray[k] = resRight[j];
-        j++;
-        k++;
-    }
-
-}
-
-void mergeSort(unsigned long long arr[], int resultArray[], int left, int right) {
-    if (left < right) {
-
-        int mid = left + (right - left) / 2;
-
-        mergeSort(arr, resultArray, left, mid);
-        mergeSort(arr, resultArray, mid + 1, right);
-
-        merge(arr, resultArray, left, mid, right);
-    }
-}
-
-
 struct TPhoneNumber{
     unsigned int country;
     unsigned int city;
@@ -164,54 +99,52 @@ struct TPhoneNumber{
 };
 
 
-//void CountingSort(unsigned long long* array, int* resultArray,
-//                  const int &arraySize,
-//                  const int &numbersCount = NUMBERS_COUNT)
-//{
-//    unsigned int maskArray[arraySize];
-//    for (int i = 0; i < arraySize; i++){
-//        maskArray[i] = array[i] & MASK;
-//    }
-//    int copyResultArray[arraySize];
-//    unsigned long long copyArray[arraySize];
-//    unsigned int dopArray[numbersCount];
-//    for (int i = 0; i < numbersCount; i++) {
-//        dopArray[i] = 0;
-//    }
-//    for (int i = 0; i < arraySize; i++) {
-//        ++dopArray[maskArray[i]];
-//    }
-//    for (int i = 1; i < numbersCount; i++) {
-//        dopArray[i] = dopArray[i] + dopArray[i - 1];
-//    }
-//    for (int i = arraySize - 1; i >= 0; i--) {
-//        copyResultArray[dopArray[maskArray[i]] - 1] = resultArray[i];
-//        copyArray[dopArray[maskArray[i]] - 1] = array[i];
-//        --dopArray[maskArray[i]];
-//    }
-//    for (int i = 0; i < arraySize; i++) {
-//        resultArray[i] = copyResultArray[i];
-//        array[i] = copyArray[i];
-//    }
-//}
+void CountingSort(unsigned long long* array, int* resultArray,
+                  const int &arraySize,
+                  const int &numbersCount = NUMBERS_COUNT)
+{
+    unsigned char maskArray[arraySize];
+    for (int i = 0; i < arraySize; i++){
+        maskArray[i] = array[i] & MASK;
+    }
+    int copyResultArray[arraySize];
+    unsigned long long copyArray[arraySize];
+    unsigned int dopArray[numbersCount];
+    for (int i = 0; i < numbersCount; i++) {
+        dopArray[i] = 0;
+    }
+    for (int i = 0; i < arraySize; i++) {
+        ++dopArray[maskArray[i]];
+    }
+    for (int i = 1; i < numbersCount; i++) {
+        dopArray[i] = dopArray[i] + dopArray[i - 1];
+    }
+    for (int i = arraySize - 1; i >= 0; i--) {
+        copyResultArray[dopArray[maskArray[i]] - 1] = resultArray[i];
+        copyArray[dopArray[maskArray[i]] - 1] = array[i];
+        --dopArray[maskArray[i]];
+    }
+    for (int i = 0; i < arraySize; i++) {
+        resultArray[i] = copyResultArray[i];
+        array[i] = copyArray[i];
+    }
+
+}
 
 
-//void RadixSort(unsigned long long* array, int* resultArray,
-//               const int &arraySize){
-//    for (int i = 0; i < sizeof(unsigned long long); i++){
-//        CountingSort(array, resultArray, arraySize);
-//        for (int j = 0; j < arraySize; j++){
-//            array[j] = array[j] >> BITS_COUNT;
-//        }
-//    }
-//}
+void RadixSort(unsigned long long* array, int* resultArray,
+               const int &arraySize){
+    for (int i = 0; i < sizeof(unsigned long long); i++){
+        CountingSort(array, resultArray, arraySize);
+        for (int j = 0; j < arraySize; j++){
+            array[j] = array[j] >> BITS_COUNT;
+        }
+    }
+}
 
 
 int main(){
-
-
-//    FILE* fd = fopen("./output.txt", "r");
-    FILE* fd = fopen("./big.txt", "r");
+    FILE* fd = fopen("./output.txt", "r");
 
     TVector<TPhoneNumber> baseArray;
     TPhoneNumber element;
@@ -241,22 +174,19 @@ int main(){
         dopArray[i] = baseArray[i].phone;
         resultArray[i] = i;
     }
-    mergeSort(dopArray, resultArray, 0, length - 1);
+    RadixSort(dopArray, resultArray, length);
     for (int i = 0; i < length; i++){
         dopArray[i] = baseArray[resultArray[i]].city;
     }
-    mergeSort(dopArray, resultArray, 0, length - 1);
+    RadixSort(dopArray, resultArray, length);
     for (int i = 0; i < length; i++){
         dopArray[i] = baseArray[resultArray[i]].country;
     }
-    mergeSort(dopArray, resultArray, 0, length - 1);
+    RadixSort(dopArray, resultArray, length);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
 
-//    for (int i = 0; i < length; i++){
-//        printf("%s\t%s\n", baseArray[resultArray[i]].outputString, baseArray[resultArray[i]].value.GetData());
-//    }
 
     std::cout << "Время выполнения: " << duration.count() << " секунд" << std::endl;
 

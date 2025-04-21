@@ -99,56 +99,68 @@ struct TPhoneNumber{
 };
 
 
-void CountingSort(unsigned long long* array, int* resultArray,
-                  const int &arraySize,
-                  const int &numbersCount = NUMBERS_COUNT)
+//void CountingSort(unsigned long long* array, int* resultArray,
+//                  const int &arraySize,
+//                  const int &numbersCount = NUMBERS_COUNT)
+//{
+//    unsigned char maskArray[arraySize];
+//    for (int i = 0; i < arraySize; i++){
+//        maskArray[i] = array[i] & MASK;
+//    }
+//    int copyResultArray[arraySize];
+//    unsigned long long copyArray[arraySize];
+//    unsigned int dopArray[numbersCount];
+//    for (int i = 0; i < numbersCount; i++) {
+//        dopArray[i] = 0;
+//    }
+//    for (int i = 0; i < arraySize; i++) {
+//        ++dopArray[maskArray[i]];
+//    }
+//    for (int i = 1; i < numbersCount; i++) {
+//        dopArray[i] = dopArray[i] + dopArray[i - 1];
+//    }
+//    for (int i = arraySize - 1; i >= 0; i--) {
+//        copyResultArray[dopArray[maskArray[i]] - 1] = resultArray[i];
+//        copyArray[dopArray[maskArray[i]] - 1] = array[i];
+//        --dopArray[maskArray[i]];
+//    }
+//    for (int i = 0; i < arraySize; i++) {
+//        resultArray[i] = copyResultArray[i];
+//        array[i] = copyArray[i];
+//    }
+//
+//}
+//
+//
+//void RadixSort(unsigned long long* array, int* resultArray,
+//               const int &arraySize){
+//    for (int i = 0; i < sizeof(unsigned long long); i++){
+//        CountingSort(array, resultArray, arraySize);
+//        for (int j = 0; j < arraySize; j++){
+//            array[j] = array[j] >> BITS_COUNT;
+//        }
+//    }
+//}
+
+void insertionSort(unsigned long long arr[], int* resultArray, int n)
 {
-    unsigned char maskArray[arraySize];
-    for (int i = 0; i < arraySize; i++){
-        maskArray[i] = array[i] & MASK;
-    }
-    int copyResultArray[arraySize];
-    unsigned long long copyArray[arraySize];
-    unsigned int dopArray[numbersCount];
-    for (int i = 0; i < numbersCount; i++) {
-        dopArray[i] = 0;
-    }
-    for (int i = 0; i < arraySize; i++) {
-        ++dopArray[maskArray[i]];
-    }
-    for (int i = 1; i < numbersCount; i++) {
-        dopArray[i] = dopArray[i] + dopArray[i - 1];
-    }
-    for (int i = arraySize - 1; i >= 0; i--) {
-        copyResultArray[dopArray[maskArray[i]] - 1] = resultArray[i];
-        copyArray[dopArray[maskArray[i]] - 1] = array[i];
-        --dopArray[maskArray[i]];
-    }
-    for (int i = 0; i < arraySize; i++) {
-        resultArray[i] = copyResultArray[i];
-        array[i] = copyArray[i];
-    }
+    for (int i = 1; i < n; ++i) {
+        unsigned long long keyArr = arr[i];
+        int keyRes = resultArray[i];
+        int j = i - 1;
 
-}
-
-
-void RadixSort(unsigned long long* array, int* resultArray,
-               const int &arraySize){
-    for (int i = 0; i < sizeof(unsigned long long); i++){
-        CountingSort(array, resultArray, arraySize);
-        for (int j = 0; j < arraySize; j++){
-            array[j] = array[j] >> BITS_COUNT;
+        while (j >= 0 && arr[j] > keyArr) {
+            resultArray[j + 1] = resultArray[j];
+            arr[j + 1] = arr[j];
+            j = j - 1;
         }
+        arr[j + 1] = keyArr;
+        resultArray[j + 1] = keyRes;
     }
 }
-
 
 int main(){
-
-
-
-//    FILE* fd = fopen("./output.txt", "r");
-    FILE* fd = fopen("./big.txt", "r");
+    FILE* fd = fopen("./test300.txt", "r");
 
     TVector<TPhoneNumber> baseArray;
     TPhoneNumber element;
@@ -178,22 +190,18 @@ int main(){
         dopArray[i] = baseArray[i].phone;
         resultArray[i] = i;
     }
-    RadixSort(dopArray, resultArray, length);
+    insertionSort(dopArray, resultArray, length);
     for (int i = 0; i < length; i++){
         dopArray[i] = baseArray[resultArray[i]].city;
     }
-    RadixSort(dopArray, resultArray, length);
+    insertionSort(dopArray, resultArray, length);
     for (int i = 0; i < length; i++){
         dopArray[i] = baseArray[resultArray[i]].country;
     }
-    RadixSort(dopArray, resultArray, length);
+    insertionSort(dopArray, resultArray, length);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
-
-//    for (int i = 0; i < length; i++){
-//        printf("%s\t%s\n", baseArray[resultArray[i]].outputString, baseArray[resultArray[i]].value.GetData());
-//    }
 
 
     std::cout << "Время выполнения: " << duration.count() << " секунд" << std::endl;

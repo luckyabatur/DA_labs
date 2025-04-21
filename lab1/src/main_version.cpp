@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstring>
-#include <chrono>
 
 
 const int VALUE_LENGTH = 2049;
@@ -164,8 +163,6 @@ int main(){
     int length = baseArray.GetSize();
     unsigned long long dopArray[length];
     int resultArray[length];
-
-    auto start = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < length; i++){
         dopArray[i] = baseArray[i].phone;
