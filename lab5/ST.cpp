@@ -8,7 +8,6 @@
 const int ALPHABET_SIZE = 27;
 const int SHIFT = 97;
 
-//enum class FUNCTION_TYPE {BUILDING, FIND};
 
 struct TNode;
 
@@ -75,9 +74,10 @@ class TSuffixTree{
         }
         int result{1};
         while (currEdge->l + result <= currEdge->r && (*str)[textPosition] == text[currEdge->l + result]){
+            textPosition++;
             result++;
         }
-        if (result + currEdge->l == currEdge->r){
+        if (result + currEdge->l - 1 == currEdge->r){
             return {true, result};
         }
         else{
@@ -111,14 +111,11 @@ class TSuffixTree{
 
 public:
     TSuffixTree(const std::string& str){
-        text = str;
+        text = str + '$';
         TNode* currNode{};
         TEdge* currEdge{};
         int currPosition{};
         for (int i{}; i < text.size(); i++){
-            if (i == 3){
-                int a = 1;
-            }
             currNode = &root;
             currPosition = i;
             while (true){
@@ -144,9 +141,11 @@ public:
         int currPosition{};
         while (true){
             currEdge = SelectEdge(currPosition, currNode, &str);
-            if (currEdge == nullptr){
-
+            if (currEdge == nullptr && str.size() == currPosition){
                 return DFS(currNode);
+            }
+            else if (currEdge == nullptr){
+                return {};
             }
             std::pair<bool, int> pr = CompareEdge(currPosition + 1, currEdge, &str);
             currPosition += pr.second;
@@ -158,19 +157,12 @@ public:
                 return {};
             }
         }
-
-
-
-    }  //хз как работают &&
-
-
-
 };
 
 
 int main(void){
     TSuffixTree tree("abcdabc");
-    std::vector<int> res = tree.Find("ab");
+    std::vector<int> res = tree.Find("abce");
     std::string a = "a";
     return 0;
 }
