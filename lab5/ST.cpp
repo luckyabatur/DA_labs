@@ -5,10 +5,10 @@
 #include <queue>
 
 
-const int ALPHABET_SIZE = 26;
+const int ALPHABET_SIZE = 27;
 const int SHIFT = 97;
 
-//enum class COMPARE_RESULT {START, MIDDLE, END};
+//enum class FUNCTION_TYPE {BUILDING, FIND};
 
 struct TNode;
 
@@ -32,7 +32,7 @@ class TSuffixTree{
 
 
     int LetterToIndex(char ch){
-        return ch - SHIFT;
+        return ch == '$' ? ALPHABET_SIZE - 1 : ch - SHIFT;
     }
 
     std::vector<int> DFS(TNode* node){
@@ -56,9 +56,12 @@ class TSuffixTree{
     }
 
 
-    TEdge* SelectEdge(int textPosition, TNode* currNode){
+    TEdge* SelectEdge(int textPosition, TNode* currNode, const std::string* str = nullptr){
+        if (str == nullptr){
+            str = &text;
+        }
         for (int j{}; j < ALPHABET_SIZE; j++){
-            if (currNode->edges[j].edgeNode != nullptr && text[currNode->edges[j].l] == text[textPosition]){
+            if (currNode->edges[j].edgeNode != nullptr && text[currNode->edges[j].l] == (*str)[textPosition]){
                 return &currNode->edges[j];
             }
         }
@@ -66,9 +69,12 @@ class TSuffixTree{
     }
 
 
-    std::pair<bool, int> CompareEdge(int textPosition, TEdge* currEdge){
+    std::pair<bool, int> CompareEdge(int textPosition, TEdge* currEdge, const std::string* str = nullptr){
+        if (str == nullptr){
+            str = &text;
+        }
         int result{1};
-        while (currEdge->l + result <= currEdge->r && text[textPosition] == text[currEdge->l + result]){
+        while (currEdge->l + result <= currEdge->r && (*str)[textPosition] == text[currEdge->l + result]){
             result++;
         }
         if (result + currEdge->l == currEdge->r){
@@ -105,7 +111,7 @@ class TSuffixTree{
 
 public:
     TSuffixTree(const std::string& str){
-        text = str + '$';
+        text = str;
         TNode* currNode{};
         TEdge* currEdge{};
         int currPosition{};
@@ -133,18 +139,23 @@ public:
     }
 
     std::vector<int> Find(const std::string& str){
-        TNode* currNode{};
+        TNode* currNode = &root;
         TEdge* currEdge{};
         int currPosition{};
         while (true){
-            currEdge = SelectEdge(currPosition, currNode);
+            currEdge = SelectEdge(currPosition, currNode, &str);
             if (currEdge == nullptr){
+
                 return DFS(currNode);
             }
-            std::pair<bool, int> pr = CompareEdge(currPosition + 1, currEdge);
+            std::pair<bool, int> pr = CompareEdge(currPosition + 1, currEdge, &str);
             currPosition += pr.second;
-            if (!pr.first){
+            currNode = currEdge->edgeNode;
+            if (currPosition == str.size()){
                 return DFS(currNode);
+            }
+            else if (!pr.first){
+                return {};
             }
         }
 
@@ -158,6 +169,8 @@ public:
 
 
 int main(void){
-    TSuffixTree tree("xabxac");
+    TSuffixTree tree("abcdabc");
+    std::vector<int> res = tree.Find("ab");
+    std::string a = "a";
     return 0;
 }
