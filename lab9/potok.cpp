@@ -29,7 +29,7 @@ int main(){
 
     while(pathFound){
         std::vector<bool>visited(n, false);
-        std::vector<int> path(n, -1);
+        std::vector<std::pair<int , long long>> path(n, {-1, -1});
         std::queue<int> q;
 
         visited[START] = true;
@@ -40,19 +40,27 @@ int main(){
             q.pop();
             for (size_t i{}; i < graph[node].size(); i++){
                 if (!visited[graph[node][i][0]] && graph[node][i][2] > 0){
-                    path[graph[node][i][0]] = node;
+                    long long edgeMin{};
+                    if (graph[node][i][1] != graph[node][i][2] ){
+                        edgeMin = std::min(graph[node][i][1], graph[node][i][2]);
+                    } else if (graph[node][i][1] == graph[node][i][2]){
+
+
+                    }
+                    path[graph[node][i][0]] = {node, edgeMin};
                     visited[graph[node][i][0]] = true;
                     q.push(graph[node][i][0]);
                 }
             }
         }
 
+        long long minEl{};
         if (!visited[n - 1]){
             pathFound = false;
         } else{
             int id = n - 1;
             while (id != -1){
-
+                if ()
 
 
             }
